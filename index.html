@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Leads · Yuri Catunda</title>
+<style>
+:root{--bg:#f6f7f9;--card:#ffffff;--text:#1d1f24;--muted:#6b7280;--accent:#0f766e;--line:#e5e7eb;--danger:#b91c1c}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0f1115;--card:#181b22;--text:#eceef2;--muted:#9aa3b2;--accent:#2dd4bf;--line:#2a2f3a;--danger:#f87171}}
+:root[data-theme="dark"]{--bg:#0f1115;--card:#181b22;--text:#eceef2;--muted:#9aa3b2;--accent:#2dd4bf;--line:#2a2f3a;--danger:#f87171}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:560px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:1.3rem;margin:8px 0 2px}
+.sub{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{font-size:1rem;margin:0 0 8px}
+label{display:block;font-size:.85rem;color:var(--muted);margin:10px 0 4px}
+input,select,textarea{width:100%;font:inherit;font-size:16px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text)}
+textarea{min-height:64px;resize:vertical}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:.85rem;color:var(--muted);margin-top:12px}
+.check input{width:auto;margin-top:3px}
+button{font:inherit;border:0;border-radius:10px;padding:12px 14px;cursor:pointer;background:var(--accent);color:#fff;font-weight:600}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
+button.danger{background:transparent;color:var(--danger);border:1px solid var(--line)}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btns button{flex:1 1 auto}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:1.3rem}
+.stat span{font-size:.75rem;color:var(--muted)}
+.filters{display:flex;gap:8px;margin-bottom:12px}
+.filters input,.filters select{padding:10px;font-size:15px}
+.lead{border-top:1px solid var(--line);padding:12px 0}
+.lead:first-child{border-top:0;padding-top:0}
+.lead h3{margin:0 0 4px;font-size:1rem}
+.meta{font-size:.85rem;color:var(--muted);margin:2px 0}
+.lead select{width:auto;padding:8px;font-size:14px;margin-top:6px}
+.empty{color:var(--muted);text-align:center;padding:20px 0}
+.msg{font-size:.85rem;color:var(--accent);min-height:1.2em;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Leads</h1>
+  <p class="sub">Yuri Catunda · Baía Conecta</p>
+
+  <div class="stats">
+    <div class="stat"><b id="sTotal">0</b><span>total</span></div>
+    <div class="stat"><b id="sNovo">0</b><span>novos</span></div>
+    <div class="stat"><b id="sFechado">0</b><span>fechados</span></div>
+  </div>
+
+  <form class="card" id="form" autocomplete="off">
+    <h2>Novo lead</h2>
+    <label for="nome">Nome da pessoa *</label>
+    <input id="nome" required maxlength="80">
+
+    <label for="negocio">Nome do negócio</label>
+    <input id="negocio" maxlength="80">
+
+    <label for="servico">Serviço de interesse</label>
+    <select id="servico">
+      <option>Site ou landing page</option>
+      <option>Loja virtual</option>
+      <option>Automação de WhatsApp</option>
+      <option>Agendamento ou vendas com IA</option>
+      <option>Placa de avaliação Google</option>
+      <option>Outro</option>
+    </select>
+
+    <label for="cidade">Cidade ou bairro</label>
+    <input id="cidade" maxlength="60" placeholder="Ex.: Salvador, Itaigara">
+
+    <label for="whats">WhatsApp com DDD *</label>
+    <input id="whats" type="tel" inputmode="tel" required placeholder="71 99999-9999">
+
+    <label for="obs">Observação</label>
+    <textarea id="obs" maxlength="300" placeholder="O que essa pessoa disse que precisa"></textarea>
+
+    <label class="check"><input type="checkbox" id="consent" required> Essa pessoa me passou o contato e concordou em ser contatada sobre os meus serviços.</label>
+
+    <div class="btns"><button type="submit">Salvar lead</button></div>
+    <div class="msg" id="formMsg"></div>
+  </form>
+
+  <div class="card">
+    <h2>Leads salvos</h2>
+    <div class="filters">
+      <input id="busca" placeholder="Buscar nome ou negócio">
+      <select id="filtro">
+        <option value="">Todos</option>
+        <option value="novo">Novo</option>
+        <option value="contatado">Contatado</option>
+        <option value="orcamento">Orçamento enviado</option>
+        <option value="fechado">Fechado</option>
+        <option value="perdido">Sem interesse</option>
+      </select>
+    </div>
+    <div id="lista"></div>
+    <div class="btns"><button class="ghost" id="copiar">Copiar lista em texto</button><button class="danger" id="apagarTudo">Apagar todos os dados</button></div>
+    <div class="msg" id="listaMsg"></div>
+  </div>
+</div>
+
+<script>
+const KEY = "leads-yuri-v1";
+const STATUS = {
+  novo: "Novo",
+  contatado: "Contatado",
+  orcamento: "Orçamento enviado",
+  fechado: "Fechado",
+  perdido: "Sem interesse"
+};
+
+let leads = [];
+try { leads = JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { leads = []; }
+
+function persist() {
+  try { localStorage.setItem(KEY, JSON.stringify(leads)); return true; }
+  catch (e) { document.getElementById("listaMsg").textContent = "Não foi possível salvar neste navegador."; return false; }
+}
+
+function normalizarTelefone(v) {
+  let d = (v || "").replace(/\D/g, "");
+  if (d.length === 10 || d.length === 11) d = "55" + d;
+  return d;
+}
+
+function mensagemPadrao(lead) {
+  return "Oi, " + lead.nome + "! Tudo bem? Sou o Yuri, da Baía Conecta. " +
+    "Vi o seu interesse em " + lead.servico.toLowerCase() + ". " +
+    "Posso te mandar um diagnóstico gratuito de 5 minutos, sem compromisso?";
+}
+
+function atualizarStats() {
+  document.getElementById("sTotal").textContent = leads.length;
+  document.getElementById("sNovo").textContent = leads.filter(l => l.status === "novo").length;
+  document.getElementById("sFechado").textContent = leads.filter(l => l.status === "fechado").length;
+}
+
+function criarElemento(tag, texto, classe) {
+  const el = document.createElement(tag);
+  if (texto !== undefined) el.textContent = texto;
+  if (classe) el.className = classe;
+  return el;
+}
+
+function renderizar() {
+  atualizarStats();
+  const busca = document.getElementById("busca").value.trim().toLowerCase();
+  const filtro = document.getElementById("filtro").value;
+  const lista = document.getElementById("lista");
+  lista.textContent = "";
+
+  const visiveis = leads.filter(l => {
+    const texto = (l.nome + " " + l.negocio).toLowerCase();
+    return (!busca || texto.includes(busca)) && (!filtro || l.status === filtro);
+  });
+
+  if (!visiveis.length) {
+    lista.appendChild(criarElemento("div", leads.length ? "Nenhum lead com esse filtro." : "Nenhum lead ainda.", "empty"));
+    return;
+  }
+
+  visiveis.forEach(lead => {
+    const box = criarElemento("div", undefined, "lead");
+    box.appendChild(criarElemento("h3", lead.nome + (lead.negocio ? " · " + lead.negocio : "")));
+    box.appendChild(criarElemento("div", lead.servico, "meta"));
+    box.appendChild(criarElemento("div", (lead.cidade || "Cidade não informada") + " · " + lead.whats, "meta"));
+    if (lead.obs) box.appendChild(criarElemento("div", lead.obs, "meta"));
+    box.appendChild(criarElemento("div", "Cadastrado em " + new Date(lead.criado).toLocaleDateString("pt-BR"), "meta"));
+
+    const sel = criarElemento("select");
+    Object.keys(STATUS).forEach(k => {
+      const op = criarElemento("option", STATUS[k]);
+      op.value = k;
+      if (k === lead.status) op.selected = true;
+      sel.appendChild(op);
+    });
+    sel.addEventListener("change", () => {
+      lead.status = sel.value;
+      if (persist()) renderizar();
+    });
+    box.appendChild(sel);
+
+    const btns = criarElemento("div", undefined, "btns");
+    const zap = criarElemento("button", "Chamar no WhatsApp");
+    zap.type = "button";
+    zap.addEventListener("click", () => {
+      const url = "https://wa.me/" + normalizarTelefone(lead.whats) + "?text=" + encodeURIComponent(mensagemPadrao(lead));
+      window.open(url, "_blank", "noopener");
+      if (lead.status === "novo") { lead.status = "contatado"; persist(); renderizar(); }
+    });
+    const del = criarElemento("button", "Excluir", "danger");
+    del.type = "button";
+    del.addEventListener("click", () => {
+      if (!confirm("Excluir o lead de " + lead.nome + "?")) return;
+      leads = leads.filter(l => l.id !== lead.id);
+      if (persist()) renderizar();
+    });
+    btns.appendChild(zap);
+    btns.appendChild(del);
+    box.appendChild(btns);
+    lista.appendChild(box);
+  });
+}
+
+document.getElementById("form").addEventListener("submit", e => {
+  e.preventDefault();
+  const msg = document.getElementById("formMsg");
+  const whats = normalizarTelefone(document.getElementById("whats").value);
+  if (whats.length < 12) { msg.textContent = "Confira o WhatsApp com DDD."; return; }
+  if (!document.getElementById("consent").checked) { msg.textContent = "Marque a confirmação de consentimento."; return; }
+
+  leads.unshift({
+    id: Date.now(),
+    nome: document.getElementById("nome").value.trim(),
+    negocio: document.getElementById("negocio").value.trim(),
+    servico: document.getElementById("servico").value,
+    cidade: document.getElementById("cidade").value.trim(),
+    whats: document.getElementById("whats").value.trim(),
+    obs: document.getElementById("obs").value.trim(),
+    status: "novo",
+    criado: new Date().toISOString()
+  });
+
+  if (!persist()) { leads.shift(); return; }
+  e.target.reset();
+  msg.textContent = "Lead salvo.";
+  setTimeout(() => { msg.textContent = ""; }, 2500);
+  renderizar();
+});
+
+document.getElementById("copiar").addEventListener("click", () => {
+  const linhas = leads.map(l =>
+    [l.nome, l.negocio, l.servico, l.cidade, l.whats, STATUS[l.status], l.obs].filter(Boolean).join(" | ")
+  );
+  const texto = linhas.length ? linhas.join("\n") : "Nenhum lead cadastrado.";
+  const msg = document.getElementById("listaMsg");
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(texto).then(
+      () => { msg.textContent = "Lista copiada."; },
+      () => { msg.textContent = "Não consegui copiar. Selecione o texto manualmente."; }
+    );
+  } else {
+    msg.textContent = "Cópia não disponível neste navegador.";
+  }
+});
+
+document.getElementById("apagarTudo").addEventListener("click", () => {
+  if (!leads.length) { document.getElementById("listaMsg").textContent = "Não há dados para apagar."; return; }
+  if (!confirm("Apagar TODOS os " + leads.length + " leads deste navegador? Isso não pode ser desfeito.")) return;
+  if (!confirm("Confirma a exclusão definitiva?")) return;
+  leads = [];
+  try { localStorage.removeItem(KEY); } catch (e) {}
+  document.getElementById("listaMsg").textContent = "Todos os dados foram apagados.";
+  renderizar();
+});
+
+document.getElementById("busca").addEventListener("input", renderizar);
+document.getElementById("filtro").addEventListener("change", renderizar);
+renderizar();
+</script>
+</body>
+</html>
